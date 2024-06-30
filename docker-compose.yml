@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres_db_login:
+    image: postgres:latest
+    container_name: postgres_db_login
+    environment:
+      POSTGRES_USER: quizzapi
+      POSTGRES_PASSWORD: quizzapi
+      POSTGRES_DB: quizz
+    ports:
+      - "5432:5432"
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KC_HEALTH_ENABLED: 'true'
+      KC_METRICS_ENABLED: 'true'
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres_db_login:5432/quizz
+      KC_DB_USERNAME: quizzapi
+      KC_DB_PASSWORD: quizzapi
+      KC_HOSTNAME: localhost
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_FEATURES: token-exchange,admin-fine-grained-authz
+    command: ["start-dev"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres_db_login
+volumes:
+  pgdata:
